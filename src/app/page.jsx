@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import ReactMarkdown from "react-markdown";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import Header from "./components/Header";
 
 const GEMINI_API_KEY = "AIzaSyDXxgJYdFKWJ4kn-jH0C2uGkU-K9jvxn1w";
 
@@ -58,6 +59,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-dvh bg-black">
+      <Header />
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {messages.map((message, index) => (
@@ -69,7 +71,7 @@ export default function Home() {
             title="Send"
           >
             <div
-              className={`max-w-[80%] rounded-lg p-4 ${
+              className={`max-w-[100%] lg:max-w-[80%] rounded-2xl p-4 text-justify ${
                 message.role === "user"
                   ? "bg-blue-500 text-white"
                   : "bg-white shadow-md text-black"
