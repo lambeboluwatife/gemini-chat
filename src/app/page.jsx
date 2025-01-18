@@ -5,13 +5,17 @@ import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import ReactMarkdown from "react-markdown";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+const GEMINI_API_KEY = "AIzaSyDXxgJYdFKWJ4kn-jH0C2uGkU-K9jvxn1w";
+
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+let chat = null;
+
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
-
-  const GEMINI_API_KEY = "AIzaSyDXxgJYdFKWJ4kn-jH0C2uGkU-K9jvxn1w";
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -21,20 +25,15 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
-  const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const chat = model.startChat({
-    history: [
-      {
-        role: "user",
-        parts: [{ text: "Hello" }],
-      },
-      {
-        role: "model",
-        parts: [{ text: "Great to meet you. What would you like to know?" }],
-      },
-    ],
-  });
+  const callGemini = async (text) => {
+    if (!chat) {
+      chat = model.startChat({ history: [] });
+    }
+
+    const result = await chat.sendMessage(text);
+
+    return result.response.text();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,24 +41,23 @@ export default function Home() {
 
     const userMessage = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
-    const result = await chat.sendMessage(input);
-
     setInput("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      const modelMessage = {
-        role: "model",
-        content:
-          result.response.text() || "I'm sorry, I don't understand that.",
-      };
+    try {
+      const modelResponse = await callGemini(input);
+
+      const modelMessage = { role: "model", content: modelResponse };
       setMessages((prev) => [...prev, modelMessage]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-black">
+    <div className="flex flex-col h-dvh bg-black">
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {messages.map((message, index) => (
