@@ -8,7 +8,7 @@ const Header = () => {
         <div className="p-2 bg-blue-500 rounded-full">
           <Image src={chatboxIcon} alt="chatbox icon" width={40} height={40} />
         </div>
-        <h1 className="text-black p-4 pl-0 font-black">LBD Chatbox AI</h1>
+        <h1 className="text-black p-4 pl-0 font-black">LBD AI Chatbox</h1>
       </div>
     </div>
   );
